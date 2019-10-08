@@ -64,6 +64,7 @@ typings/
 .vscode
 env.yml
 data/**
+**/*.zip
 build/**
 **/.serverless/**
 **/.dynamodb/**
