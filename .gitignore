@@ -69,3 +69,5 @@ build/**
 **/.serverless/**
 **/.dynamodb/**
 ssm*.json
+**/cfn.params.*
+!**/cfn.params.*.example
