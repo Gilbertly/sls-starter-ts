@@ -23,3 +23,11 @@ $ npm run validate:all
 // start-up apigateway and dynamodb localhost
 $ npm run api:start
 ```
+
+## AWS Deployment Config
+```sh
+// update params at `config/cfn.params.json` from `config/cfn.params.json.example`
+
+// create initial pre-deployment serverless resources
+$ npm run cli:cmd cfn.configure <STACK_NAME>
+```
