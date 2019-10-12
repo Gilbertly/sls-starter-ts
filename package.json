@@ -18,7 +18,7 @@
     "ddb:install": "sls dynamodb install",
     "ddb:start": "sls dynamodb start --migrate",
     "api:start": "sls offline start --noAuth",
-    "ssm:start": "ts-node ./src/scripts/ssm_modify.ts"
+    "cli:cmd": "ts-node ./src/utils/cli.entrypoint.ts --"
   },
   "repository": {
     "type": "git",
@@ -76,6 +76,7 @@
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.11",
     "@types/webpack": "^4.39.2",
+    "@types/yargs": "^13.0.3",
     "@typescript-eslint/eslint-plugin": "^2.3.3",
     "@typescript-eslint/parser": "^2.3.3",
     "dotenv": "^8.1.0",
@@ -97,7 +98,8 @@
     "ts-node": "^8.4.1",
     "typescript": "^3.6.3",
     "webpack": "^4.41.0",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "yargs": "^14.2.0"
   },
   "dependencies": {
     "@sentry/node": "^5.6.2",
