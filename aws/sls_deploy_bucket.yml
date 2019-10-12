@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Creates S3 bucket for Serverless to upload artifacts to.
+Resources:
+  DeployBucketServerlessTs:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retains
+Outputs:
+  BucketName:
+    Description: Serverless Typescript's deployment bucket.
+    Value: !Ref DeployBucketServerlessTs
