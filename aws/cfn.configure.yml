@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Configures pre-deployment resources required by Serverless.
+Parameters:
+  DeployBucketServerlessTsName:
+    Type: String
+    Description: Serverless deploy-artifacts bucket.
+    AllowedPattern: (?!-)[a-zA-Z0-9-.]{1,63}(?<!-)
+    ConstraintDescription: Must be a globaly unique and valid bucket name.
+Resources:
+  DeployBucketServerlessTs:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref DeployBucketServerlessTsName
+Outputs:
+  BucketName:
+    Description: Serverless Typescript's deployment bucket.
+    Value: !Ref DeployBucketServerlessTs

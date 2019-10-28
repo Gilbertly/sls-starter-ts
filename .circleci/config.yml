@@ -1,0 +1,90 @@
+version: 2
+jobs:
+  install-dependencies:
+    working_directory: ~/aws-typescript
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install Dependencies
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get install python3-pip python3-dev build-essential
+            sudo pip3 install awscli --upgrade
+            npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - ./
+
+  build-deploy-dev:
+    working_directory: ~/aws-typescript
+    docker:
+      - image: circleci/node:10
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Configure Serverless AWS Credentials
+          command: ./node_modules/.bin/serverless config credentials --provider aws --key ${ACCESS_KEY} --secret ${SECRET_KEY}
+      - run:
+          name: Serverless Dev Account Deploy
+          command: npm run deploy:dev
+
+  build-deploy-prod:
+    working_directory: ~/aws-typescript
+    docker:
+      - image: circleci/node:10
+    steps:
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Configure Serverless AWS Credentials
+          command: ./node_modules/.bin/serverless config credentials --provider aws --key ${ACCESS_KEY} --secret ${SECRET_KEY}
+      - run:
+          name: Serverless Prod Account Deploy
+          command: npm run deploy:prod
+
+  sentry-release:
+    working_directory: ~/aws-typescript
+    docker:
+      - image: circleci/node:10
+    steps:
+      - run:
+          name: Sentry Release
+          command: |
+            export SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+            export SENTRY_ORG=${SENTRY_ORG}
+            VERSION=$(git rev-parse --short HEAD)
+            ./node_modules/.bin/sentry-cli releases new -p ${SENTRY_PROJECT} $VERSION
+            ./node_modules/.bin/sentry-cli releases set-commits --auto $VERSION
+
+workflows:
+  version: 2
+  dev:
+    jobs:
+      - install-dependencies
+      - build-deploy-dev:
+          filters:
+            branches:
+              only:
+                - staging
+          requires:
+            - install-dependencies
+      - build-deploy-prod:
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - install-dependencies
+      - sentry-release

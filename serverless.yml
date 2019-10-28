@@ -1,0 +1,85 @@
+service:
+  name: aws-typescript
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  config: ${file(./config/env.yml):${opt:stage, 'dev'}}
+  webpack:
+    webpackConfig: config/webpack.config.js
+    packagePath: .package.json
+    includeModules: false
+    excludeFiles: src/__tests__
+    packager: npm
+    forceExclude:
+      - aws-sdk
+  serverless-offline:
+    port: ${self:custom.config.API_PORT, '6969'}
+  dynamodb:
+    seed:
+      hello:
+        sources:
+          - table: ${self:provider.stage}-hello
+            sources: [./config/seed_hello.json]
+    migration:
+      dir: ./data/migrations
+    start:
+      port: ${self:custom.config.DDB_PORT, '6970'}
+      inMemory: true
+      migrate: true
+      seed: true
+    stages: ${self:provider.stage}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  timeout: 10 # seconds
+  stage: ${self:custom.config.STAGE}
+  region: ${self:custom.config.REGION}
+  stackName: ${self:provider.stage}-${self:service.name}
+  logRetentionInDays: 7
+  tags:
+    project: ${self:provider.stage}-${self:service.name}
+  deploymentBucket:
+    name: ${self:custom.config.DEPLOY_BUCKET}
+    serverSideEncryption: AES256
+  apiGateway:
+    restApiId: ${ssm:/aws_typescript/sls/restapi_id}
+    restApiRootResourceId: ${ssm:/aws_typescript/sls/restapi_root_resource_id}
+  environment:
+    SENTRY_DSN: ${ssm:/aws_typescript/sls/sentry_dsn}
+
+layers:
+  dependencies:
+    name: aws_typescript
+    description: Typescript project dependencies.
+    package:
+      artifact: dependencies.zip
+    compatibleRuntimes:
+      - nodejs10.x
+    licenseInfo: MIT
+
+package:
+  include:
+    - src/**
+  exclude:
+    - .git/**
+    - .serverless/**
+    - nodejs/**
+  excludeDevDependencies: true
+
+functions:
+  helloFunction:
+    name: hello_function
+    handler: src/functions/hello.handler
+    description: Basic sample function.
+    layers:
+      - !Ref DependenciesLambdaLayer
+
+resources:
+  - ${file(./aws/sls_iam_roles.yml)}
+  - ${file(./aws/sls_lambda_dlq.yml)}
+  - ${file(./aws/dynamodb_hello.yml)}
