@@ -4,35 +4,47 @@
 
 ## Setup
 
+First ensure that you have exported the relevant AWS credentials for your environment, with the command:
+
 ```sh
 // expose aws profile credentials
 $ export AWS_PROFILE=<PROFILE_NAME>
+```
 
-// copy `config/env.yml.example` to `config/env.yml`
-// populate `config/env.yml` with project secrets
+### SSM Parameters: `download`
 
-// install dynamodb-local
-$ npm run ddb:install
+Downloads existing project secrets from AWS environment to local file:
 
-// `create` or `download` project ssm secrets:
-// 1. `create` a new file `./config/ssm.sls.json`
-$ npm run ssm:update
+```sh
+// download existing secrets from an ssm path
+$ npm run cli:cmd <COMMAND> <SSM_PATH> <FILENAME>
+$ npm run cli:cmd ssm.download /starter_ts/ dev
+```
 
-// 2. `download` an existing secrets
-$ npm run ssm:download
+### SSM Parameters: `update`
 
-// validate setup
+Creates or updates project secrets onto an AWS environment:
+
+```sh
+// create a new secrets file, eg. `./config/ssm.dev.json`
+$ touch ./config/ssm.dev.json
+
+// create or update secrets from a file
+$ npm run cli:cmd <COMMAND> <FILENAME>
+$ npm run cli:cmd ssm.update dev
+```
+
+### Validate Project Setup
+
+Validates your development environment:
+
+```sh
 $ npm run validate:all
 
-// start-up apigateway and dynamodb localhost
+// start apigateway + dynamodb localhost
+$ npm run ddb:install
 $ npm run api:start
 ```
 
-## AWS Deployment Config
-
-```sh
-// update params at `config/cfn.params.json` from `config/cfn.params.json.example`
-
-// create initial pre-deployment serverless resources
-$ npm run cli:cmd cfn.configure <STACK_NAME>
-```
+> _NOTE:_ Run the command `npm run ddb:install` initially, and not everytime you are starting
+> apigateway + dynamodb locally.
