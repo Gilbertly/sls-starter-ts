@@ -1,13 +1,13 @@
 [
   {
-    "Name": "/aws-python/secret",
+    "Name": "/starter_ts/secret",
     "Description": "Simple secret.",
     "Type": "String",
     "Value": "one",
     "Overwrite": true
   },
   {
-    "Name": "/aws-python/secure_secret",
+    "Name": "/starter_ts/secure_secret",
     "Description": "Secure secret with kms encryption.",
     "Type": "SecureString",
     "Value": "one",
@@ -15,7 +15,7 @@
     "KeyId": "key"
   },
   {
-    "Name": "/aws-python/secrets",
+    "Name": "/starter_ts/secrets",
     "Description": "Two secrets separated by a comma.",
     "Type": "StringList",
     "Value": "one, two",
