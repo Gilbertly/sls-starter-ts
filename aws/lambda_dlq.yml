@@ -1,6 +1,6 @@
 Resources:
   DeadLetterQueueLambda:
-    Type: AWS::SQS:Queue
+    Type: AWS::SQS::Queue
     Properties:
       QueueName: ${self:service.name}-dlq
       MessageRetentionPeriod: 604800 # 7 days
