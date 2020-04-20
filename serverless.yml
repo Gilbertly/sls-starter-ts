@@ -1,13 +1,13 @@
 service:
-  name: aws-typescript
+  name: starter-ts
 
 plugins:
+  - serverless-pseudo-parameters
   - serverless-webpack
   - serverless-dynamodb-local
   - serverless-offline
 
 custom:
-  config: ${file(./config/env.yml):${opt:stage, 'dev'}}
   webpack:
     webpackConfig: config/webpack.config.js
     packagePath: .package.json
@@ -32,43 +32,53 @@ custom:
       migrate: true
       seed: true
     stages: ${self:provider.stage}
+  ssmPath:
+    sentry_dsn: ${ssm:/starter_ts/sentry_dsn, ''}
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   timeout: 10 # seconds
-  stage: ${self:custom.config.STAGE}
-  region: ${self:custom.config.REGION}
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
   stackName: ${self:provider.stage}-${self:service.name}
   logRetentionInDays: 7
+  iamRoleStatements: ${file(./aws/iam_statements.yml)}
   tags:
     project: ${self:provider.stage}-${self:service.name}
-  deploymentBucket:
-    name: ${self:custom.config.DEPLOY_BUCKET}
-    serverSideEncryption: AES256
+  apiKeys:
+    - ${self:provider.stage}-${self:service.name}
   apiGateway:
-    restApiId: ${ssm:/aws_typescript/sls/restapi_id}
-    restApiRootResourceId: ${ssm:/aws_typescript/sls/restapi_root_resource_id}
+    apiKeySourceType: HEADER
+  deploymentBucket:
+    blockPublicAccess: true
+    serverSideEncryption: AES256
   environment:
-    SENTRY_DSN: ${ssm:/aws_typescript/sls/sentry_dsn}
+    SENTRY_DSN: ${self:custom.ssmPath.sentry_dsn}
 
 layers:
   dependencies:
-    name: aws_typescript
-    description: Typescript project dependencies.
+    name: ${self:provider.stage}-${self:service.name}
+    description: Starter typescript project dependencies.
     package:
       artifact: dependencies.zip
     compatibleRuntimes:
-      - nodejs10.x
+      - nodejs12.x
     licenseInfo: MIT
 
 package:
-  include:
-    - src/**
   exclude:
     - .git/**
     - .serverless/**
+    - src/__tests__/**
+    - src/utils/**
+    - dependencies.zip
+    - node_modules/**
+    - coverage/**
     - nodejs/**
+    - aws/**
+  include:
+    - src/**
   excludeDevDependencies: true
 
 functions:
@@ -76,10 +86,21 @@ functions:
     name: hello_function
     handler: src/functions/hello.handler
     description: Basic sample function.
+    events:
+      - http:
+          path: /test
+          method: get
+          request:
+            parameters:
+              queryStrings:
+                message: false
+              paths:
+                message: false
+          cors: true
+          private: true
     layers:
       - !Ref DependenciesLambdaLayer
 
 resources:
-  - ${file(./aws/sls_iam_roles.yml)}
-  - ${file(./aws/sls_lambda_dlq.yml)}
   - ${file(./aws/dynamodb_hello.yml)}
+  - ${file(./aws/lambda_dlq.yml)}
