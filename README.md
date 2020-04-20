@@ -1,5 +1,9 @@
 # Project Template: `aws-typescript`
+
+[![codecov](https://codecov.io/gh/Gilbertly/sls-starter-ts/branch/master/graph/badge.svg?token=3n0d40Byzd)](https://codecov.io/gh/Gilbertly/sls-starter-ts)
+
 ## Setup
+
 ```sh
 // expose aws profile credentials
 $ export AWS_PROFILE=<PROFILE_NAME>
@@ -25,6 +29,7 @@ $ npm run api:start
 ```
 
 ## AWS Deployment Config
+
 ```sh
 // update params at `config/cfn.params.json` from `config/cfn.params.json.example`
 
