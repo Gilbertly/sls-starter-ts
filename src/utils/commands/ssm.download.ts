@@ -65,7 +65,7 @@ export const build = (): yargs.CommandModule => {
     const response = await getParametersByPath(ssmParameterPath, nextToken);
     if (response.Parameters && response.NextToken) {
       await Promise.all(
-        response.Parameters.map(async param => {
+        response.Parameters.map(async (param) => {
           const paramHistory = await getParameterHistory(param.Name || '');
           if (paramHistory)
             params.push({
@@ -84,7 +84,7 @@ export const build = (): yargs.CommandModule => {
       );
     } else if (response.Parameters) {
       await Promise.all(
-        response.Parameters.map(async param => {
+        response.Parameters.map(async (param) => {
           const paramHistory = await getParameterHistory(param.Name || '');
           if (paramHistory)
             params.push({
@@ -109,7 +109,7 @@ export const build = (): yargs.CommandModule => {
 
     if (response.Parameters && response.NextToken) {
       await Promise.all(
-        response.Parameters.map(async param => {
+        response.Parameters.map(async (param) => {
           const paramHistory = await getParameterHistory(param.Name || '');
           if (paramHistory)
             responseParams.push({
@@ -129,7 +129,7 @@ export const build = (): yargs.CommandModule => {
       saveFile(downloadFilename, responseParams);
     } else if (response.Parameters) {
       await Promise.all(
-        response.Parameters.map(async param => {
+        response.Parameters.map(async (param) => {
           const paramHistory = await getParameterHistory(param.Name || '');
           if (paramHistory)
             responseParams.push({
