@@ -8,7 +8,7 @@ const spinner = ora({ spinner: 'bouncingBar' });
 const ssm = new SSM({ region: process.env.REGION || 'us-east-1' });
 
 export const build = (): yargs.CommandModule => {
-  interface SSMDownloadProps {
+  interface SSMUpdateProps {
     filename: string;
   }
 
@@ -51,7 +51,7 @@ export const build = (): yargs.CommandModule => {
     );
   };
 
-  const update = async (args: SSMDownloadProps) => {
+  const update = async (args: SSMUpdateProps) => {
     const ssmFilename = args.filename;
     spinner.start(
       `Updating SSM params from './config/ssm.${ssmFilename}.json' ...`,
