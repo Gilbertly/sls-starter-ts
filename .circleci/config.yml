@@ -1,90 +1,97 @@
 version: 2
-jobs:
-  install-dependencies:
-    working_directory: ~/aws-typescript
+refs:
+  container_config: &container_config
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
+    working_directory: ~/app
+  steps:
+    - &install_dependencies
+      run:
+        name: Install Dependencies
+        command: |
+          npm install
+    - &save_cache
+      save_cache:
+        paths:
+          - node_modules
+        key: v1-dependencies-{{ checksum "package.json" }}
+    - &restore_cache
+      restore_cache:
+        keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+    - &persist_workspace
+      persist_to_workspace:
+        root: ./
+        paths:
+          - ./
+    - &attach_workspace
+      attach_workspace:
+        at: ~/app
+    - &test_build
+      run:
+        name: Run Tests, Audit Fix, & Build
+        command: npm run validate:all
+    - &sls_configure
+      run:
+        name: Configure Serverless AWS Credentials
+        command: ./node_modules/.bin/sls config credentials --provider aws --key ${ACCESS_KEY} --secret ${SECRET_KEY}
+    - &sentry_release
+      run:
+        name: Sentry Release
+        command: |
+          export SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+          export SENTRY_ORG=${SENTRY_ORG}
+          VERSION=$(git rev-parse --short HEAD)
+          ./node_modules/.bin/sentry-cli releases new -p ${SENTRY_PROJECT} $VERSION
+          ./node_modules/.bin/sentry-cli releases set-commits --auto $VERSION
+
+jobs:
+  build:
+    <<: *container_config
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-      - run:
-          name: Install Dependencies
-          command: |
-            sudo apt-get -y -qq update
-            sudo apt-get install python3-pip python3-dev build-essential
-            sudo pip3 install awscli --upgrade
-            npm install
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
-      - persist_to_workspace:
-          root: ./
-          paths:
-            - ./
+      - *install_dependencies
+      - *save_cache
+      - *restore_cache
+      - *persist_workspace
 
-  build-deploy-dev:
-    working_directory: ~/aws-typescript
-    docker:
-      - image: circleci/node:10
+  deploy_dev:
+    <<: *container_config
     steps:
-      - attach_workspace:
-          at: ./
+      - *attach_workspace
+      - *sls_configure
       - run:
-          name: Configure Serverless AWS Credentials
-          command: ./node_modules/.bin/serverless config credentials --provider aws --key ${ACCESS_KEY} --secret ${SECRET_KEY}
-      - run:
-          name: Serverless Dev Account Deploy
+          name: Deploy to Dev
           command: npm run deploy:dev
 
-  build-deploy-prod:
-    working_directory: ~/aws-typescript
-    docker:
-      - image: circleci/node:10
+  deploy_prod:
+    <<: *container_config
     steps:
-      - attach_workspace:
-          at: ./
+      - *attach_workspace
+      - *sls_configure
       - run:
-          name: Configure Serverless AWS Credentials
-          command: ./node_modules/.bin/serverless config credentials --provider aws --key ${ACCESS_KEY} --secret ${SECRET_KEY}
-      - run:
-          name: Serverless Prod Account Deploy
+          name: Deploy to Prod
           command: npm run deploy:prod
-
-  sentry-release:
-    working_directory: ~/aws-typescript
-    docker:
-      - image: circleci/node:10
-    steps:
-      - run:
-          name: Sentry Release
-          command: |
-            export SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-            export SENTRY_ORG=${SENTRY_ORG}
-            VERSION=$(git rev-parse --short HEAD)
-            ./node_modules/.bin/sentry-cli releases new -p ${SENTRY_PROJECT} $VERSION
-            ./node_modules/.bin/sentry-cli releases set-commits --auto $VERSION
 
 workflows:
   version: 2
-  dev:
+  build_deploy:
     jobs:
-      - install-dependencies
-      - build-deploy-dev:
+      - build
+      - deploy_dev:
           filters:
             branches:
               only:
-                - staging
+                - develop
           requires:
-            - install-dependencies
-      - build-deploy-prod:
+            - build
+          context: sls-starter-ts-dev
+      - deploy_prod:
           filters:
             branches:
               only:
                 - master
           requires:
-            - install-dependencies
-      - sentry-release
+            - build
+          context: sls-starter-ts-prod
