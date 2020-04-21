@@ -17,7 +17,7 @@ custom:
     forceExclude:
       - aws-sdk
   serverless-offline:
-    port: ${self:custom.config.API_PORT, '6969'}
+    port: ${opt:apiport, '6969'}
   dynamodb:
     seed:
       hello:
@@ -27,7 +27,7 @@ custom:
     migration:
       dir: ./data/migrations
     start:
-      port: ${self:custom.config.DDB_PORT, '6970'}
+      port: ${opt:ddbport, '6970'}
       inMemory: true
       migrate: true
       seed: true
