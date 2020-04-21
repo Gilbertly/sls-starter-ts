@@ -13,9 +13,9 @@
     "layer:zip": "zip -qr dependencies.zip nodejs && rimraf -f ./nodejs",
     "clean:build": "rimraf -f build && npm run build && npm run layer:prepare",
     "validate:sls": "sls deploy --stage dev --noDeploy",
-    "validate:all": "npm run validate:sls && npm run lint:test && npm run clean:build",
-    "deploy:dev": "npm run clean:build && sls deploy --stage dev",
-    "deploy:prod": "npm run clean:build && sls deploy --stage prod",
+    "validate:all": "npm run lint:test && npm run clean:build",
+    "deploy:dev": "npm run validate:all && sls deploy --stage dev",
+    "deploy:prod": "npm run validate:all && sls deploy --stage prod",
     "ddb:install": "sls dynamodb install",
     "ddb:start": "sls dynamodb start --migrate",
     "api:start": "sls offline start --noAuth",
@@ -29,8 +29,7 @@
   "license": "MIT",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint:test",
-      "pre-push": "npm run validate:all"
+      "pre-commit": "npm run lint:test"
     }
   },
   "devDependencies": {
