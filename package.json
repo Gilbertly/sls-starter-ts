@@ -19,9 +19,9 @@
     "ddb:install": "sls dynamodb install",
     "ddb:start": "sls dynamodb start --migrate",
     "api:start": "sls offline start --noAuth",
-    "ssm:download": "ts-node ./src/utils/cli.ts ssm.download",
-    "ssm:upload": "ts-node ./src/utils/cli.ts ssm.upload",
-    "ssm:delete": "ts-node ./src/utils/cli.ts ssm.delete"
+    "ssm:download": "ts-node ./src/utils/cli.ts ssmDownload",
+    "ssm:upload": "ts-node ./src/utils/cli.ts ssmUpload",
+    "ssm:delete": "ts-node ./src/utils/cli.ts ssmDelete"
   },
   "repository": {
     "type": "git",
