@@ -58,7 +58,7 @@ export const build = (): yargs.CommandModule => {
   };
 
   return {
-    command: 'ssm.delete <filename>',
+    command: 'ssmDelete <filename>',
     describe: 'Deletes AWS SSM parameters from local file.',
     handler: (args: any) => deleteCmd(args).catch(console.error),
     builder: (args: yargs.Argv) =>

@@ -30,7 +30,7 @@ export const build = (): yargs.CommandModule => {
   };
 
   return {
-    command: 'cfn.configure <stackname>',
+    command: 'cfnConfigure <stackname>',
     describe: 'Configures pre-deployment resources required by Serverless.',
     handler: (args: any) => cfnConfigure(args).catch(console.error),
     builder: (args: yargs.Argv) =>

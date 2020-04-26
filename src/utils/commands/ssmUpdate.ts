@@ -62,7 +62,7 @@ export const build = (): yargs.CommandModule => {
   };
 
   return {
-    command: 'ssm.update <filename>',
+    command: 'ssmUpdate <filename>',
     describe: 'Updates AWS SSM parameters from local file.',
     handler: (args: any) => update(args).catch(console.error),
     builder: (args: yargs.Argv) =>

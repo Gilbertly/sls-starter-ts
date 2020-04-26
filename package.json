@@ -20,7 +20,7 @@
     "ddb:start": "sls dynamodb start --migrate",
     "api:start": "sls offline start --noAuth",
     "ssm:download": "ts-node ./src/utils/cli.ts ssmDownload",
-    "ssm:upload": "ts-node ./src/utils/cli.ts ssmUpload",
+    "ssm:update": "ts-node ./src/utils/cli.ts ssmUpdate",
     "ssm:delete": "ts-node ./src/utils/cli.ts ssmDelete"
   },
   "repository": {
