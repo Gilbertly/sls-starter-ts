@@ -17,8 +17,8 @@ Downloads existing project secrets from AWS environment to local file:
 
 ```sh
 // download existing secrets from an ssm path
-$ npm run cli:cmd <COMMAND> <SSM_PATH> <FILENAME>
-$ npm run cli:cmd ssm.download /starter_ts/ dev
+$ npm run ssm:download <SSM_PATH> <FILENAME>
+$ npm run ssm:download /starter_ts/ dev
 ```
 
 ### SSM Parameters: `update`
@@ -30,8 +30,18 @@ Creates or updates project secrets onto an AWS environment:
 $ touch ./config/ssm.dev.json
 
 // create or update secrets from a file
-$ npm run cli:cmd <COMMAND> <FILENAME>
-$ npm run cli:cmd ssm.update dev
+$ npm run ssm:update <FILENAME>
+$ npm run ssm:update dev
+```
+
+### SSM Parameters: `delete`
+
+Removes project secrets added in an AWS environment:
+
+```sh
+// remove secrets from a file
+$ npm run ssm:delete <FILENAME>
+$ npm run ssm:delete dev
 ```
 
 ### Validate Project Setup
