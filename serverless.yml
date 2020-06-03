@@ -42,7 +42,6 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
   stackName: ${self:provider.stage}-${self:service.name}
-  profile: deployuser-${self:provider.stage}
   logRetentionInDays: 7
   iamRoleStatements: ${file(./aws/iam_statements.yml)}
   tags:

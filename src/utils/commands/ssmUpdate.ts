@@ -30,7 +30,7 @@ export const build = (): yargs.CommandModule => {
 
   const updateParameters = async (params: SSM.PutParameterRequest[]) => {
     await Promise.all(
-      params.map(async (param) => {
+      params.map(async param => {
         try {
           await ssm
             .putParameter({
