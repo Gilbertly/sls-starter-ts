@@ -78,7 +78,7 @@
   },
   "dependencies": {
     "@sentry/node": "^5.25.0",
-    "aws-sdk": "^2.768.0",
+    "aws-sdk": "^2.792.0",
     "chrome-aws-lambda": "^5.0.0",
     "chrome-launcher": "^0.13.0",
     "lighthouse": "^6.0.0",
