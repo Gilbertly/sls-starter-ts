@@ -61,7 +61,7 @@
     "ora": "^5.1.0",
     "prettier": "^2.1.2",
     "rimraf": "^3.0.2",
-    "semantic-release": "^17.2.2",
+    "semantic-release": "^17.2.3",
     "serverless": "^2.11.1",
     "serverless-dynamodb-local": "^0.2.39",
     "serverless-offline": "^6.8.0",
