@@ -83,7 +83,7 @@ package:
 
 functions:
   helloFunction:
-    name: hello_function
+    name: hello_function_ts
     handler: src/functions/hello.handler
     description: Basic sample function.
     events:
