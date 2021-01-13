@@ -1,0 +1,5 @@
+prod:
+  sentryDSN: ${env:PROD_SENTRY_DSN}
+
+dev:
+  sentryDSN: ${env:DEV_SENTRY_DSN}
