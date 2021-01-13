@@ -32,8 +32,7 @@ custom:
       migrate: true
       seed: true
     stages: ${self:provider.stage}
-  ssmPath:
-    sentry_dsn: ${ssm:/starter_ts/sentry_dsn, ''}
+  param: ${file(./config/params.yml)}
 
 provider:
   name: aws
@@ -54,7 +53,7 @@ provider:
     blockPublicAccess: true
     serverSideEncryption: AES256
   environment:
-    SENTRY_DSN: ${self:custom.ssmPath.sentry_dsn}
+    SENTRY_DSN: ${self:custom.param.${self:provider.stage}.sentryDSN}
 
 layers:
   dependencies:
@@ -65,21 +64,6 @@ layers:
     compatibleRuntimes:
       - nodejs12.x
     licenseInfo: MIT
-
-package:
-  exclude:
-    - .git/**
-    - .serverless/**
-    - src/__tests__/**
-    - src/utils/**
-    - dependencies.zip
-    - node_modules/**
-    - coverage/**
-    - nodejs/**
-    - aws/**
-  include:
-    - src/**
-  excludeDevDependencies: true
 
 functions:
   helloFunction:
