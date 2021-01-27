@@ -80,7 +80,7 @@
     "aws-sdk": "^2.826.0",
     "chrome-aws-lambda": "^5.5.0",
     "chrome-launcher": "^0.13.4",
-    "lighthouse": "^7.0.0",
+    "lighthouse": "^7.0.1",
     "lighthouse-logger": "^1.2.0"
   }
 }
