@@ -1,7 +1,0 @@
-[
-  {
-    "ParameterKey": "DeployBucketServerlessApigwName",
-    "ParameterValue": "",
-    "UsePreviousValue": true
-  }
-]
