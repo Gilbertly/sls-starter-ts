@@ -1,8 +1,0 @@
-- Sid: AllowLambdaDynamoDBAccess
-  Effect: Allow
-  Action:
-    - dynamodb:PutItem
-    - dynamodb:UpdateItem
-    - dynamodb:Query
-  Resource:
-    - !GetAtt DynamodbTableHello.Arn
