@@ -18,7 +18,7 @@
       "@semantic-release/changelog",
       {
         "changelogFile": ".github/CHANGELOG.md",
-        "changelogTitle": "Auto-release Changelog"
+        "changelogTitle": "## Auto-release Changelog"
       }
     ],
     ["@semantic-release/git", { "assets": [".github/CHANGELOG.md", "package.json", "package-lock.json"] }],
