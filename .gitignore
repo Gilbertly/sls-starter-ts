@@ -67,6 +67,7 @@ data/**
 **/*.zip
 build/**
 nodejs/**
+.husky/**
 **/.serverless/**
 **/.dynamodb/**
 ssm*.json
