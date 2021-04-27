@@ -1,11 +1,9 @@
-service:
-  name: starter-ts
+service: starter-ts
+useDotenv: true
 
 plugins:
-  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
   - serverless-webpack
-  - serverless-dynamodb-local
-  - serverless-offline
 
 custom:
   webpack:
@@ -14,24 +12,7 @@ custom:
     includeModules: false
     excludeFiles: src/__tests__
     packager: npm
-    forceExclude:
-      - aws-sdk
-  serverless-offline:
-    port: ${opt:apiport, '6969'}
-  dynamodb:
-    seed:
-      hello:
-        sources:
-          - table: ${self:provider.stage}-hello
-            sources: [./config/seed_hello.json]
-    migration:
-      dir: ./data/migrations
-    start:
-      port: ${opt:ddbport, '6970'}
-      inMemory: true
-      migrate: true
-      seed: true
-    stages: ${self:provider.stage}
+    forceExclude: [aws-sdk]
   param: ${file(./config/params.yml)}
 
 provider:
@@ -40,15 +21,15 @@ provider:
   timeout: 10 # seconds
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  stackName: ${self:provider.stage}-${self:service.name}
+  stackName: ${self:provider.stage}-${self:service}
   logRetentionInDays: 7
-  iamRoleStatements: ${file(./aws/iam_statements.yml)}
   tags:
-    project: ${self:provider.stage}-${self:service.name}
-  apiKeys:
-    - ${self:provider.stage}-${self:service.name}
+    project: ${self:provider.stage}-${self:service}
   apiGateway:
     apiKeySourceType: HEADER
+    shouldStartNameWithService: true
+    apiKeys:
+      - ${self:provider.stage}-${self:service}
   deploymentBucket:
     blockPublicAccess: true
     serverSideEncryption: AES256
@@ -57,13 +38,14 @@ provider:
 
 layers:
   dependencies:
-    name: ${self:provider.stage}-${self:service.name}
+    name: ${self:provider.stage}-${self:service}
     description: Starter typescript project dependencies.
-    package:
-      artifact: dependencies.zip
-    compatibleRuntimes:
-      - nodejs12.x
+    # package:
+    #   artifact: dependencies.zip
+    compatibleRuntimes: [nodejs12.x]
     licenseInfo: MIT
+    path: ./nodejs
+    retain: false
 
 functions:
   helloFunction:
@@ -76,15 +58,20 @@ functions:
           method: get
           request:
             parameters:
-              queryStrings:
-                message: false
               paths:
                 message: false
           cors: true
           private: true
-    layers:
-      - !Ref DependenciesLambdaLayer
+    iamRoleStatements:
+      - Sid: AllowLambdaDynamoDBAccess
+        Effect: Allow
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:Query
+        Resource: !GetAtt DynamodbTableHello.Arn
+    layers: [!Ref DependenciesLambdaLayer]
 
 resources:
-  - ${file(./aws/dynamodb_hello.yml)}
-  - ${file(./aws/lambda_dlq.yml)}
+  - ${file(./aws/cfnTemplateSections.yml)}
+  - ${file(./aws/dynamodbTables.yml)}
