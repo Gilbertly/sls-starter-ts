@@ -35,7 +35,7 @@ jobs:
     
       - name: Deploy feature branch
         env:
-          BRANCH_HASH: echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-6
+          BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-6)
         run: npm run deploy:feat B${{ env.BRANCH_HASH }}
       
       # - name: Remove feature branch
