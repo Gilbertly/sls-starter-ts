@@ -38,6 +38,8 @@ jobs:
           BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
         run: npm run deploy:feat br-${{ env.BRANCH_HASH }}
       
-      # - name: Remove feature branch
-      #   if: pull_request.types == 'closed'
-      #   run: npm run remove:feat pr${{ github.event.number }}
+      - name: Remove feature branch
+        if: pull_request.types == 'closed'
+        env:
+          BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
+        run: npm run remove:feat br-${{ env.BRANCH_HASH }}
