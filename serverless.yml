@@ -49,7 +49,7 @@ layers:
 
 functions:
   helloFunction:
-    name: hello_function_ts
+    name: ${self:provider.stage}_hello_function_ts
     handler: src/functions/hello.handler
     description: Basic sample function.
     events:
