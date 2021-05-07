@@ -8,7 +8,7 @@ on:
     branches: 
       - 'feat*'
       - 'ft*'
-    types: [opened, closed, reopened, edited]
+    types: [closed]
 
 jobs:
   buildDeploy:
@@ -39,7 +39,7 @@ jobs:
         run: npm run deploy:feat br-${{ env.BRANCH_HASH }}
       
       - name: Remove feature branch
-        if: pull_request.types == 'closed'
+        if: github.event.pull_request.merged == true
         env:
           BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
         run: npm run remove:feat br-${{ env.BRANCH_HASH }}
