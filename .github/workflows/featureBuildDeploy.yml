@@ -4,7 +4,7 @@ on:
     branches: 
       - 'feat*'
       - 'ft*'
-    types: [ opened, synchronize, closed, reopened, edited ]
+    types: [opened, synchronize, closed, reopened, edited]
 
 jobs:
   buildDeploy:
