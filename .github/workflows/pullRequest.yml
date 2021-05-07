@@ -1,7 +1,7 @@
 name: pullRequest
 on:
   pull_request:
-    branches: [feat-*, ft-*, hotfix-*]
+    branches: [feat*, ft*, hotfix-*]
     types: [opened, synchronize, closed]
 
 jobs:
