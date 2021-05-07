@@ -4,11 +4,11 @@ on:
     branches: 
       - 'feat*'
       - 'ft*'
-  # pull_request:
-  #   branches: 
-  #     - 'feat*'
-  #     - 'ft*'
-  #   types: [opened, synchronize, closed, reopened, edited]
+  pull_request:
+    branches: 
+      - 'feat*'
+      - 'ft*'
+    types: [opened, synchronize, closed, reopened, edited]
 
 jobs:
   buildDeploy:
