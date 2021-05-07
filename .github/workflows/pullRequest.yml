@@ -1,0 +1,29 @@
+name: pullRequest
+on:
+  pull_request:
+    branches: [feat-*, ft-*, hotfix-*]
+    types: [opened, synchronize, closed]
+
+jobs:
+  buildDeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Restore & cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm i --no-package-lock
+    
+      - name: Deploy feature branch
+        if: pull_request.types == 'opened' || pull_request.types == 'synchronize'
+        run: npm run deploy:feat pr${GITHUB_REF##*/}
+      
+      - name: Remove feature branch
+        if: pull_request.types == 'closed'
+        run: npm run remove:feat pr${GITHUB_REF##*/}
