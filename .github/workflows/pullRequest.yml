@@ -1,8 +1,10 @@
 name: pullRequest
 on:
   pull_request:
-    branches: [feat*, ft*, hotfix-*]
-    types: [opened, synchronize, closed]
+    branches: 
+      - 'feat*'
+      - 'ft*'
+    types: [opened, synchronize, closed, reopened, edited]
 
 jobs:
   buildDeploy:
