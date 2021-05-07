@@ -1,10 +1,14 @@
 name: featureBuildDeploy
 on:
-  pull_request:
+  push:
     branches: 
       - 'feat*'
       - 'ft*'
-    types: [opened, synchronize, closed, reopened, edited]
+  # pull_request:
+  #   branches: 
+  #     - 'feat*'
+  #     - 'ft*'
+  #   types: [opened, synchronize, closed, reopened, edited]
 
 jobs:
   buildDeploy:
