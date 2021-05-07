@@ -12,6 +12,7 @@ on:
 
 jobs:
   buildDeploy:
+    if: github.event.number != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
