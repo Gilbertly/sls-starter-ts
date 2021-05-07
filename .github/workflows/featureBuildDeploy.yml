@@ -12,7 +12,7 @@ on:
 
 jobs:
   buildDeploy:
-    if: github.event.number != ''
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
