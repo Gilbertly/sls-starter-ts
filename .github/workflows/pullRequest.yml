@@ -1,5 +1,9 @@
 name: pullRequest
 on:
+  push:
+    branches: 
+      - 'feat*'
+      - 'ft*'
   pull_request:
     branches: 
       - 'feat*'
