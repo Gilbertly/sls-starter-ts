@@ -1,7 +1,7 @@
 import { APIGatewayEvent, Context } from 'aws-lambda';
 import * as Sentry from '@sentry/node';
 
-Sentry.init({ dsn: process.env.SENTRY_DSN });
+Sentry.init({ dsn: process.env.SENTRY_DSN | '' });
 
 const sayHello = (message: string): string => {
   return `Hello ${message}!`;
