@@ -1,9 +1,5 @@
 name: featureBuildDeploy
 on:
-  push:
-    branches: 
-      - 'feat*'
-      - 'ft*'
   pull_request:
     branches: 
       - 'feat*'
@@ -35,8 +31,8 @@ jobs:
     
       - name: Deploy feature branch
         # if: pull_request.types == 'opened' || pull_request.types == 'synchronize'
-        run: npm run deploy:feat pr${GITHUB_REF##*/}
+        run: npm run deploy:feat pr${{ github.event.number }}
       
       # - name: Remove feature branch
       #   if: pull_request.types == 'closed'
-      #   run: npm run remove:feat pr${GITHUB_REF##*/}
+      #   run: npm run remove:feat pr${{ github.event.number }}
