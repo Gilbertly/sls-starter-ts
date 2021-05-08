@@ -38,7 +38,7 @@ jobs:
           BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
           BRANCH_COMMIT: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
           # BRANCH_URL: https://github.com/${{ github.repository }}/tree/${GITHUB_REF##*/}
-        run: npm run deploy:feat --stage=br-${{ env.BRANCH_HASH }} --branchCommit=${{ env.BRANCH_COMMIT }} 
+        run: npm run deploy:feat -- --stage=br-${{ env.BRANCH_HASH }} --branchCommit=${{ env.BRANCH_COMMIT }} 
         # --branchUrl=${{ env.BRANCH_URL }}
       
       - name: Remove feature branch
