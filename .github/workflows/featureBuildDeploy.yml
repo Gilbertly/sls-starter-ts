@@ -37,7 +37,8 @@ jobs:
         env:
           BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
           BRANCH_REF: $(echo -n 'https://github.com/${{ github.repository }}/commit/${{ github.sha }}')
-        run: npm run deploy:feat br-${{ env.BRANCH_HASH }} --branchRef=${{ env.BRANCH_REF }}
+        run: npm run deploy:feat 
+        # br-${{ env.BRANCH_HASH }} --branchRef=${{ env.BRANCH_REF }}
       
       - name: Remove feature branch
         if: github.event.pull_request.merged == true
