@@ -23,3 +23,8 @@ Outputs:
     Condition: IsFeatureBranch
     Description: Github branch url for this stack.
     Value: ${opt:branchUrl, ''}
+  
+  GithubBuildLogsUrl:
+    Condition: IsFeatureBranch
+    Description: Github latest build logs url for this stack.
+    Value: ${opt:buildLogsUrl, ''}
