@@ -13,7 +13,7 @@
     "clean:build": "rimraf -f build && npm run build && npm run layer:prepare",
     "validate:sls": "sls deploy --stage dev --noDeploy",
     "validate:all": "npm run lint:test && npm run clean:build",
-    "deploy:feat": "npm run validate:all && sls deploy --branchRef=$BRANCH_REF --stage ",
+    "deploy:feat": "npm run validate:all && sls deploy",
     "deploy:dev": "npm run validate:all && sls deploy --stage dev",
     "deploy:prod": "npm run validate:all && sls deploy --stage prod",
     "remove:feat": "sls remove --stage "

@@ -14,7 +14,12 @@ Conditions:
     - !Not [Condition: IsProdEnv]
 
 Outputs:
-  GithubFeatureBranchRef:
+  GithubBranchCommit:
     Condition: IsFeatureBranch
-    Description: Github feature branch for this stack.
-    Value: ${opt:branchRef, ''}
+    Description: Latest Github commit for this stack.
+    Value: ${opt:branchCommit, ''}
+
+  GithubBranchUrl:
+    Condition: IsFeatureBranch
+    Description: Github branch url for this stack.
+    Value: ${opt:branchUrl, ''}
