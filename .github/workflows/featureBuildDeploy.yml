@@ -40,10 +40,10 @@ jobs:
           BRANCH_URL: https://github.com/${{ github.repository }}/tree/$(echo ${GITHUB_REF##*/})
           BUILD_LOGS_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: npm run deploy:feat -- \
-          --stage=br-${{ env.BRANCH_HASH }} \
-          --branchCommit=${{ env.BRANCH_COMMIT }} \
-          --branchUrl=${{ env.BRANCH_URL }} \
-          --buildLogsUrl=${{ env.BUILD_LOGS_URL }}
+        --stage=br-${{ env.BRANCH_HASH }} \
+        --branchCommit=${{ env.BRANCH_COMMIT }} \
+        --branchUrl=${{ env.BRANCH_URL }} \
+        --buildLogsUrl=${{ env.BUILD_LOGS_URL }}
       
       - name: Remove feature branch
         if: github.event.pull_request.merged == true
