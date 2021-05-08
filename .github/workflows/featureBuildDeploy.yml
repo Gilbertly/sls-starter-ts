@@ -17,11 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       
-      - name: Restore & cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+      # - name: Restore & cache dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: node_modules
+      #     key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
         run: npm i --no-package-lock
@@ -36,7 +36,7 @@ jobs:
       - name: Deploy feature branch
         env:
           BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
-          BRANCH_URL: $(echo 'https://github.com/${{ github.repository }}/tree/${GITHUB_REF##*/}')
+          BRANCH_URL: $(echo -n 'https://github.com/${{ github.repository }}/tree/${GITHUB_REF##*/}')
         run: npm run deploy:feat --stage=br-${{ env.BRANCH_HASH }} --branchRef=${{ env.BRANCH_URL }}
       
       - name: Remove feature branch
