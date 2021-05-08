@@ -3,3 +3,18 @@ Conditions:
     Fn::Equals:
       - ${self:provider.stage}
       - dev
+  
+  IsProdEnv:
+    Fn::Equals:
+      - ${self:provider.stage}
+      - prod
+
+  IsFeatureBranch: !And 
+    - !Not [Condition: IsDevEnv]
+    - !Not [Condition: IsProdEnv]
+
+Outputs:
+  FeatureBranchRef:
+    Condition: IsFeatureBranch
+    Description: Github feature branch reference for this stack 'self:provider.stage'.
+    Value: ${opt:branchRef, ''}

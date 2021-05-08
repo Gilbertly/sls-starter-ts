@@ -10,6 +10,10 @@ on:
       - 'ft*'
     types: [closed]
 
+env:
+  BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
+  BRANCH_REF: $(echo '${{ github.repository }}', '${{ github.ref }}')
+
 jobs:
   buildDeploy:
     runs-on: ubuntu-latest
@@ -34,12 +38,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
     
       - name: Deploy feature branch
-        env:
-          BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
-        run: npm run deploy:feat br-${{ env.BRANCH_HASH }}
+        run: npm run deploy:feat --stage=br-${{ env.BRANCH_HASH }} --branchRef=${{ env.BRANCH_REF }}
       
       - name: Remove feature branch
         if: github.event.pull_request.merged == true
-        env:
-          BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
-        run: npm run remove:feat br-${{ env.BRANCH_HASH }}
+        run: npm run remove:feat --stage=br-${{ env.BRANCH_HASH }}
