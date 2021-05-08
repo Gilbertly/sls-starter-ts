@@ -16,5 +16,5 @@ Conditions:
 Outputs:
   GithubFeatureBranchRef:
     Condition: IsFeatureBranch
-    Description: Github feature branch reference for this stack.
+    Description: Github feature branch for this stack.
     Value: ${opt:branchRef, ''}
