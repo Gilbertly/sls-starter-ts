@@ -1,10 +1,9 @@
 name: featureBuildDeploy
 on:
-  pull_request:
+  push:
     branches: 
       - 'feat*'
       - 'ft*'
-    types: [ opened, synchronize, closed, reopened, edited ]
 
 jobs:
   buildDeploy:
@@ -22,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm i --no-package-lock
       
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -30,9 +29,9 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
     
       - name: Deploy feature branch
-        # if: pull_request.types == 'opened' || pull_request.types == 'synchronize'
-        run: npm run deploy:feat pr${{ github.event.number }}
-      
-      # - name: Remove feature branch
-      #   if: pull_request.types == 'closed'
-      #   run: npm run remove:feat pr${{ github.event.number }}
+        env:
+          BRANCH_HASH: $(echo -n '${{ github.ref }}' | md5sum | cut -d" " -f1 | cut -c1-7)
+          BRANCH_COMMIT: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          BRANCH_URL: https://github.com/${{ github.repository }}/tree/$(echo ${GITHUB_REF##*/})
+          BUILD_LOGS_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: npm run deploy:feat -- --stage=br-${{ env.BRANCH_HASH }} --branchCommit=${{ env.BRANCH_COMMIT }} --branchUrl=${{ env.BRANCH_URL }} --buildLogsUrl=${{ env.BUILD_LOGS_URL }}
