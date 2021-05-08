@@ -3,3 +3,28 @@ Conditions:
     Fn::Equals:
       - ${self:provider.stage}
       - dev
+  
+  IsProdEnv:
+    Fn::Equals:
+      - ${self:provider.stage}
+      - prod
+
+  IsFeatureBranch: !And 
+    - !Not [Condition: IsDevEnv]
+    - !Not [Condition: IsProdEnv]
+
+Outputs:
+  GithubBranchCommit:
+    Condition: IsFeatureBranch
+    Description: Latest Github commit for this stack.
+    Value: ${opt:branchCommit, ''}
+
+  GithubBranchUrl:
+    Condition: IsFeatureBranch
+    Description: Github branch url for this stack.
+    Value: ${opt:branchUrl, ''}
+  
+  GithubBuildLogsUrl:
+    Condition: IsFeatureBranch
+    Description: Github latest build logs url for this stack.
+    Value: ${opt:buildLogsUrl, ''}
