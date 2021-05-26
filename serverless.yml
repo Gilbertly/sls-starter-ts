@@ -1,4 +1,6 @@
 service: starter-ts
+frameworkVersion: '>2.4'
+configValidationMode: error
 useDotenv: true
 
 plugins:
@@ -13,16 +15,17 @@ custom:
     excludeFiles: src/__tests__
     packager: npm
     forceExclude: [aws-sdk]
-  param: ${file(./serverless.env.yml)}
+  param: ${file(./serverless.env.yml):${self:provider.stage, 'dev'}}
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: ${self:custom.param.NODE_VERSION}
   timeout: 10 # seconds
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
+  lambdaHashingVersion: 20201221
   stackName: ${self:provider.stage}-${self:service}
-  logRetentionInDays: 7
+  logRetentionInDays: ${self:custom.param.LOG_RETENTION}
   tags:
     project: ${self:provider.stage}-${self:service}
   apiGateway:
@@ -36,18 +39,16 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     NODE_TLS_REJECT_UNAUTHORIZED: 0
-    SENTRY_DSN: ${self:custom.param.${self:provider.stage}.sentryDSN}
+    SENTRY_DSN: ${self:custom.param.SENTRY_DSN}
 
 layers:
   dependencies:
     name: ${self:provider.stage}-${self:service}
-    description: Starter typescript project dependencies.
-    # package:
-    #   artifact: dependencies.zip
-    compatibleRuntimes: [nodejs12.x]
+    description: Starter typescript project dependencies ${self:custom.param.NODE_VERSION}.
+    compatibleRuntimes: ['${self:custom.param.NODE_VERSION}']
+    retain: ${self:custom.param.RETAIN_LAYER}
     licenseInfo: MIT
     path: ./nodejs
-    retain: false
 
 functions:
   helloFunction:
