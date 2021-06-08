@@ -8,9 +8,8 @@
     "watch": "tsc -w",
     "lint:fix": "eslint './src/**/*.{ts,tsx}' --fix",
     "lint:test": "npm run lint:fix && jest",
-    "layer:prepare": "rimraf -f ./nodejs && npm run layer:install",
-    "layer:install": "mkdir -p ./nodejs && cp package.json ./nodejs && cd ./nodejs && npm i --only=prod",
-    "clean:build": "rimraf -f build && npm run build && npm run layer:prepare",
+    "layer:extensions": "cd ./src/ssm-cache && chmod +x ./build.sh && ./build.sh",
+    "clean:build": "rimraf -f build && npm run build && npm run layer:extensions",
     "validate:sls": "sls deploy --stage dev --noDeploy",
     "validate:all": "npm run lint:test && npm run clean:build",
     "deploy:feat": "npm run validate:all && sls deploy",
@@ -38,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^4.22.1",
     "@typescript-eslint/parser": "^4.22.1",
     "codecov": "^3.8.2",
+    "copy-webpack-plugin": "^9.0.0",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@sentry/node": "^6.3.5",
-    "aws-sdk": "^2.902.0"
+    "aws-sdk": "^2.902.0",
+    "axios": "^0.21.1"
   }
 }
