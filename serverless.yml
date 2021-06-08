@@ -11,7 +11,7 @@ custom:
   webpack:
     webpackConfig: config/webpack.config.js
     packagePath: .package.json
-    includeModules: false
+    includeModules: true
     excludeFiles: src/__tests__
     packager: npm
     forceExclude: [aws-sdk]
@@ -42,13 +42,13 @@ provider:
     SENTRY_DSN: ${self:custom.param.SENTRY_DSN}
 
 layers:
-  dependencies:
-    name: ${self:provider.stage}-${self:service}
-    description: Starter typescript project dependencies ${self:custom.param.NODE_VERSION}.
+  extensions:
+    name: ${self:provider.stage}-${self:service}-extensions
+    description: Extension to cache SSM parameters for ${self:custom.param.NODE_VERSION}.
     compatibleRuntimes: ['${self:custom.param.NODE_VERSION}']
     retain: ${self:custom.param.RETAIN_LAYER}
     licenseInfo: MIT
-    path: ./nodejs
+    path: ./src/ssm-cache
 
 functions:
   helloFunction:
@@ -73,7 +73,15 @@ functions:
           - dynamodb:UpdateItem
           - dynamodb:Query
         Resource: !GetAtt DynamodbTableHello.Arn
-    layers: [!Ref DependenciesLambdaLayer]
+      - Sid: AllowFetchSSMParameters
+        Effect: Allow
+        Action: ssm:GetParameter*
+        Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/dataml/*
+      # - Sid: AllowDecryptSSMParameters
+      #   Effect: Allow
+      #   Action: kms:Decrypt
+      #   Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/1234abcd-12ab-34cd-56ef-12345EXAMPLE
+    layers: [!Ref ExtensionsLambdaLayer]
 
 resources:
   - ${file(./aws/cfnTemplateSections.yml)}
