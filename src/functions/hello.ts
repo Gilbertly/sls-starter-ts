@@ -20,6 +20,17 @@ const getParam = async (param: string): Promise<string> => {
   }
 };
 
+const getParams = async (): Promise<any> => {
+  try {
+    const url = `http://localhost:${SSM_PORT}/parameters`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    Sentry.captureException(error);
+    throw Error(`Error getting parameters: ${error}`);
+  }
+};
+
 exports.handler = async (
   event: APIGatewayEvent,
   context: Context,
@@ -31,6 +42,9 @@ exports.handler = async (
   try {
     const s3Bucket = await getParam('S3_BUCKET');
     console.log(`s3Bucket: ${s3Bucket}`);
+
+    const params = await getParams();
+    console.log(`s3Bucket: ${params.S3_BUCKET}`);
 
     eventParam = queryStrings.message || '';
   } catch (error) {
