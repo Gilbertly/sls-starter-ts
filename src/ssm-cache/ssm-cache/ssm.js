@@ -13,51 +13,66 @@ const ENV_YAML_FILENAME = process.env.ENV_YAML_FILENAME || 'serverless.env.yml';
 
 const filepath = `/var/task/${ENV_YAML_FILENAME}`;
 const paramsCache = {};
+const envParams = [];
 let cacheLastUpdated;
 
 async function cacheSecrets() {
   if (!fs.existsSync(filepath)) throw Error(`'${filepath}' not found.`);
 
   try {
-    const ssmClient = new AWS.SSM({region: AWS_REGION});
     var fileContents = fs.readFileSync(filepath, 'utf8');
     var data = yaml.safeLoad(fileContents);
     if (data === null) throw Error(`File '${filepath}' cannot be empty.`);
 
     var parameters = data[NODE_ENV].SSM_CACHE_PARAMS;
-    for (let [key, value] of Object.entries(parameters)) {
-      try {
-        var paramName = value;
-        const paramResponse = await ssmClient.getParameter({ Name: paramName, WithDecryption: false }).promise();
-        paramsCache[key] = paramResponse.Parameter.Value;
-        console.log(`Fetched param: '${key}: ${value}'`);
-      } catch (error) {
-        console.error(`Error fetching parameter: '${key}: ${value}'.\n${error}`);
-      }
+    for (let [_, param] of Object.entries(parameters)) {
+      envParams.push(param);
     }
-
-    // Read timeout from environment variable and set expiration timestamp
-    var timeOut = parseInt(CACHE_TIMEOUT);
-    var timeNow = new Date();
-    timeNow.setMinutes(timeNow.getMinutes() + timeOut);
-    cacheLastUpdated = timeNow;
   } catch (error) {
-    console.error(`Error reading file '${filepath}'.\n${error}`);
+    throw Error(`Error reading file '${filepath}'.\n${error}`);
   }
+
+  try {
+    const ssmClient = new AWS.SSM({region: AWS_REGION});
+    const paramsResponse = await ssmClient.getParameters({ Names: envParams, WithDecryption: false }).promise();
+
+    for (let [key, value] of Object.entries(parameters)) {
+      const paramValue = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
+      paramsCache[key] = paramValue;
+    }
+  } catch (error) {
+    throw Error(`Error fetching parameter.\n${error}`);
+  }
+
+  // Read timeout from environment variable and set expiration timestamp
+  var timeOut = parseInt(CACHE_TIMEOUT);
+  var timeNow = new Date();
+  timeNow.setMinutes(timeNow.getMinutes() + timeOut);
+  cacheLastUpdated = timeNow;
 }
 
 async function processPayload(req, res) {
+  let response;
   if (new Date() > cacheLastUpdated) await cacheSecrets();
-  var paramName = req.params.name;
-  var paramValue = paramsCache[paramName];
+  
+  if (req.params.name) {
+    var paramName = req.params.name;
+    response = paramsCache[paramName];
+  } else {
+    response = JSON.stringify(paramsCache);
+  }
 
   res.setHeader("Content-Type", "application/json");
   res.status(200);
-  res.end(paramValue);
+  res.end(response);
 }
 
 async function startHttpServer() {
   app.get("/parameter/:name", function (req, res) {
+    return processPayload(req, res);
+  });
+
+  app.get("/parameters", function (req, res) {
     return processPayload(req, res);
   });
 
