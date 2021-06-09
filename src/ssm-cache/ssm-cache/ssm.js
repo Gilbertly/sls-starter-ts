@@ -29,7 +29,7 @@ async function cacheSecrets() {
       envParams.push(param);
     }
   } catch (error) {
-    console.error(`Error reading file '${filepath}'.\n${error}`);
+    throw Error(`Error reading file '${filepath}'.\n${error}`);
   }
 
   try {
@@ -37,10 +37,11 @@ async function cacheSecrets() {
     const paramsResponse = await ssmClient.getParameters({ Names: envParams, WithDecryption: false }).promise();
 
     for (let [key, value] of Object.entries(parameters)) {
-      paramsCache[key] = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
+      const paramValue = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
+      paramsCache[key] = paramValue;
     }
   } catch (error) {
-    console.error(`Error fetching parameter.\n${error}`);
+    throw Error(`Error fetching parameter.\n${error}`);
   }
 
   // Read timeout from environment variable and set expiration timestamp
