@@ -38,7 +38,7 @@ provider:
     serverSideEncryption: AES256
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
-    NODE_TLS_REJECT_UNAUTHORIZED: 0
+    NODE_TLS_REJECT_UNAUTHORIZED: 1
     SENTRY_DSN: ${self:custom.param.SENTRY_DSN}
 
 layers:

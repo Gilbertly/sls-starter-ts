@@ -22,8 +22,13 @@ function handleShutdown(event) {
 
   const extensionId = await register();
   console.log(`extensionId: ${extensionId}`);
-  await ssmCache.cacheSecrets();
-  await ssmCache.startHttpServer();
+
+  let cacheLastUpdated = 0;
+  if (new Date() > cacheLastUpdated) {
+    const paramsCache = await ssmCache.cacheSecrets();
+    cacheLastUpdated = paramsCache.lastUpdated;
+    ssmCache.saveToFile(paramsCache.cache);
+  }
 
   // execute extensions logic
   while (true) {
@@ -33,8 +38,8 @@ function handleShutdown(event) {
         handleShutdown(event);
         break;
       case EventType.INVOKE:
-          handleInvoke(event);
-          break;
+        handleInvoke(event);
+        break;
       default:
         throw new Error(`Unknown event: ${event.eventType}`);
     }
