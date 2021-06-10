@@ -2,10 +2,7 @@
 const yaml = require('js-yaml');
 const fs = require('fs');
 const AWS = require('aws-sdk');
-const express = require("express");
-const app = express();
 
-const SSM_PORT = process.env.LAMBDA_SSM_CACHE_PORT || 4000;
 const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
 const NODE_ENV = process.env.NODE_ENV || 'dev';
 const CACHE_TIMEOUT = process.env.CACHE_TIMEOUT || 0.5;
@@ -15,6 +12,19 @@ const filepath = `/var/task/${ENV_YAML_FILENAME}`;
 const paramsCache = {};
 const envParams = [];
 let cacheLastUpdated;
+
+const saveToFile = (data) => {
+  const filename = 'params.json';
+  const filepath = '/tmp/ssm'
+
+  try {
+    if (!fs.existsSync(filepath)) fs.mkdirSync(filepath);
+    fs.writeFileSync(`${filepath}/${filename}`, JSON.stringify(data, null, 2));
+    console.log(`Saved ssm params to: '${filepath}/${filename}'`);
+  } catch (error) {
+    throw Error(`Error saving file '${filepath}/${filename}'.\n${error}`);
+  }
+};
 
 async function cacheSecrets() {
   if (!fs.existsSync(filepath)) throw Error(`'${filepath}' not found.`);
@@ -49,40 +59,14 @@ async function cacheSecrets() {
   var timeNow = new Date();
   timeNow.setMinutes(timeNow.getMinutes() + timeOut);
   cacheLastUpdated = timeNow;
-}
-
-async function processPayload(req, res) {
-  let response;
-  if (new Date() > cacheLastUpdated) await cacheSecrets();
   
-  if (req.params.name) {
-    var paramName = req.params.name;
-    response = paramsCache[paramName];
-  } else {
-    response = JSON.stringify(paramsCache);
-  }
-
-  res.setHeader("Content-Type", "application/json");
-  res.status(200);
-  res.end(response);
-}
-
-async function startHttpServer() {
-  app.get("/parameter/:name", function (req, res) {
-    return processPayload(req, res);
-  });
-
-  app.get("/parameters", function (req, res) {
-    return processPayload(req, res);
-  });
-
-  app.listen(SSM_PORT, function (error) {
-    if (error) throw error
-    console.log(`Server started on port: ${SSM_PORT}`);
-  });
+  return {
+    cache: paramsCache,
+    lastUpdated: cacheLastUpdated
+  };
 }
 
 module.exports = {
   cacheSecrets,
-  startHttpServer
+  saveToFile
 };
