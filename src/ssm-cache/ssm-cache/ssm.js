@@ -47,11 +47,10 @@ async function cacheSecrets() {
     const paramsResponse = await ssmClient.getParameters({ Names: envParams, WithDecryption: false }).promise();
 
     for (let [key, value] of Object.entries(parameters)) {
-      const paramValue = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
-      paramsCache[key] = paramValue;
+      paramsCache[key] = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
     }
   } catch (error) {
-    throw Error(`Error fetching parameter.\n${error}`);
+    console.error(`Error fetching parameter.\n${error}`);
   }
 
   // Read timeout from environment variable and set expiration timestamp
@@ -59,11 +58,40 @@ async function cacheSecrets() {
   var timeNow = new Date();
   timeNow.setMinutes(timeNow.getMinutes() + timeOut);
   cacheLastUpdated = timeNow;
+}
+
+async function processPayload(req, res) {
+  let response;
+  if (new Date() > cacheLastUpdated) await cacheSecrets();
   
-  return {
-    cache: paramsCache,
-    lastUpdated: cacheLastUpdated
-  };
+  if (req.params.name) {
+    var paramName = req.params.name;
+    response = paramsCache[paramName];
+  } else {
+    response = JSON.stringify(paramsCache);
+  }
+
+  res.setHeader("Content-Type", "application/json");
+  res.status(200);
+  res.end(response);
+}
+
+    for (let [key, value] of Object.entries(parameters)) {
+      const paramValue = paramsResponse.Parameters.filter(function(param){ return param.Name == value;})[0].Value;
+      paramsCache[key] = paramValue;
+    }
+  } catch (error) {
+    throw Error(`Error fetching parameter.\n${error}`);
+  }
+
+  app.get("/parameters", function (req, res) {
+    return processPayload(req, res);
+  });
+
+  app.listen(SSM_PORT, function (error) {
+    if (error) throw error
+    console.log(`Server started on port: ${SSM_PORT}`);
+  });
 }
 
 module.exports = {
