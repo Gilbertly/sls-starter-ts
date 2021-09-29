@@ -1,6 +1,6 @@
 service: starter-ts
 frameworkVersion: '>2.4'
-configValidationMode: warn
+configValidationMode: error
 useDotenv: true
 
 plugins:
