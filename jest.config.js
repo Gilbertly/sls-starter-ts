@@ -1,6 +1,7 @@
 module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$',
   collectCoverage: true,
+  testEnvironment: 'node',
   coverageDirectory: 'coverage/',
   transform: {
     '.(ts|tsx)': 'ts-jest',
