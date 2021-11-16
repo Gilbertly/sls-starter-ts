@@ -1,0 +1,10 @@
+Resources:
+  deploymentBucketPolicy:
+    Type: AWS::S3:BucketPolicy
+    Properties:
+      Bucket: !Ref ServerlessDeploymentBucket
+      PolicyDocument:
+        - Sid: AllowServerlessLayersPluginAccess
+          Action: s3:putObject
+          Effect: Allow
+          Principal: '*'
