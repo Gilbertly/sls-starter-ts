@@ -57,7 +57,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@sentry/node": "^6.15.0",
+    "@sentry/node": "^6.17.4",
     "aws-sdk": "^2.1029.0",
     "axios": "^0.24.0"
   }
