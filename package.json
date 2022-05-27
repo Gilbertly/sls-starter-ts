@@ -58,7 +58,7 @@
   },
   "dependencies": {
     "@sentry/node": "^6.18.2",
-    "aws-sdk": "^2.1095.0",
+    "aws-sdk": "^2.1144.0",
     "axios": "^0.26.1"
   }
 }
