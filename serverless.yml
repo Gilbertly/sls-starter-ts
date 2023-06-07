@@ -65,6 +65,11 @@ functions:
                 message: false
           cors: true
           private: true
+      - schedule:
+          name: test-schedule
+          description: Testing schedule
+          rate: rate(10 minutes)
+          enabled: true
     iamRoleStatements:
       - Sid: AllowLambdaDynamoDBAccess
         Effect: Allow
