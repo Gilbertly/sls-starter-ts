@@ -9,16 +9,16 @@ const sayHello = (message: string): string => {
   return `Hello ${message}!`;
 };
 
-const getParam = async (param: string): Promise<string> => {
-  try {
-    const url = `http://localhost:${SSM_PORT}/parameter/${param}`;
-    const response = await axios.get(url);
-    return JSON.stringify(response.data);
-  } catch (error) {
-    Sentry.captureException(error);
-    throw Error(`Error getting parameter '${param}': ${error}`);
-  }
-};
+// const getParam = async (param: string): Promise<string> => {
+//   try {
+//     const url = `http://localhost:${SSM_PORT}/parameter/${param}`;
+//     const response = await axios.get(url);
+//     return JSON.stringify(response.data);
+//   } catch (error) {
+//     Sentry.captureException(error);
+//     throw Error(`Error getting parameter '${param}': ${error}`);
+//   }
+// };
 
 const getParams = async (): Promise<any> => {
   try {
@@ -31,28 +31,35 @@ const getParams = async (): Promise<any> => {
   }
 };
 
-exports.handler = async (
-  event: APIGatewayEvent,
-  context: Context,
-): Promise<string> => {
-  context.callbackWaitsForEmptyEventLoop = false;
-  const queryStrings = event.queryStringParameters || {};
-  let eventParam = '';
+export async function handler(event: any, context: Context) {
+  console.log('Got event:', event);
+  const name = event?.detail?.name || 'Guest'
+  return `Returning name: ${name}`;
+}
 
-  try {
-    const s3Bucket = await getParam('S3_BUCKET');
-    console.log(`s3Bucket: ${s3Bucket}`);
+// exports.handler = async (
+//   event: APIGatewayEvent,
+//   context: Context,
+// ): Promise<string> => {
+//   context.callbackWaitsForEmptyEventLoop = false;
+//   console.info(event);
+//   const queryStrings = event.queryStringParameters || {};
+//   let eventParam = '';
 
-    const params = await getParams();
-    console.log(`s3Bucket: ${params.S3_BUCKET}`);
+//   try {
+//     const s3Bucket = await getParam('S3_BUCKET');
+//     console.log(`s3Bucket: ${s3Bucket}`);
 
-    eventParam = queryStrings.message || '';
-  } catch (error) {
-    console.log(error);
-    Sentry.captureException(error);
-  }
+//     const params = await getParams();
+//     console.log(`s3Bucket: ${params.S3_BUCKET}`);
 
-  return sayHello(eventParam);
-};
+//     eventParam = queryStrings.message || '';
+//   } catch (error) {
+//     console.log(error);
+//     Sentry.captureException(error);
+//   }
 
-export { sayHello };
+//   return sayHello(eventParam);
+// };
+
+// export { sayHello };

@@ -51,6 +51,17 @@ layers:
     path: ./src/ssm-cache
 
 functions:
+  triggerEb:
+    name: triggerEb
+    handler: src/functions/trigger.handler
+    iamRoleStatements:
+      - Sid: AllowTriggerEventbridge
+        Effect: Allow
+        Action: events:PutEvents
+        Resource:
+          - arn:aws:events:::rule/*
+          # - arn:aws:events:<region>:<account-id>:rule/<eventbridge-rule-name>
+
   helloFunction:
     name: ${self:provider.stage}_hello_function_ts
     handler: src/functions/hello.handler
@@ -65,10 +76,15 @@ functions:
                 message: false
           cors: true
           private: true
-      - schedule:
-          name: test-schedule
-          description: Testing schedule
-          rate: rate(10 minutes)
+      # - schedule:
+      #     name: test-schedule
+      #     description: Testing schedule
+      #     rate: rate(10 minutes)
+      #     enabled: false
+      - eventBridge:
+          pattern:
+            source: [custom.backfill.init]
+          inputPath: '$.detail'
           enabled: true
     iamRoleStatements:
       - Sid: AllowLambdaDynamoDBAccess
@@ -86,7 +102,7 @@ functions:
       #   Effect: Allow
       #   Action: kms:Decrypt
       #   Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/1234abcd-12ab-34cd-56ef-12345EXAMPLE
-    layers: [!Ref ExtensionsLambdaLayer]
+    # layers: [!Ref ExtensionsLambdaLayer]
 
 resources:
   - ${file(./aws/cfnTemplateSections.yml)}
